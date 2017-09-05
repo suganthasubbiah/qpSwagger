@@ -2,7 +2,7 @@
   "swagger" : "2.0",
   "info" : {
     "description" : "This document describes the Qualpay Platform API.",
-    "version" : "1.0",
+    "version" : "1.0.1",
     "title" : "Qualpay Platform API",
     "contact" : {
       "name" : "Qualpay"
@@ -12,29 +12,29 @@
       "url" : "http://apache.org"
     }
   },
-  "host" : "api-test.qualpay.com",
+  "host" : "localhost:9000",
   "basePath" : "/platform",
   "tags" : [ {
-    "name" : "Customer Vault",
-    "description" : "Customer Vault"
-  }, {
-    "name" : "Application Boarding",
-    "description" : "Application"
-  }, {
     "name" : "Qualpay Checkout",
     "description" : "Checkout"
-  }, {
-    "name" : "Reporting",
-    "description" : "Reporting"
-  }, {
-    "name" : "Recurring Billing",
-    "description" : "Recurring Billing"
   }, {
     "name" : "Embedded Fields",
     "description" : "Embedded Fields"
   }, {
     "name" : "Webhooks",
     "description" : "Webhooks"
+  }, {
+    "name" : "Application Boarding",
+    "description" : "Application"
+  }, {
+    "name" : "Recurring Billing",
+    "description" : "Recurring Billing"
+  }, {
+    "name" : "Reporting",
+    "description" : "Reporting"
+  }, {
+    "name" : "Customer Vault",
+    "description" : "Customer Vault"
   } ],
   "consumes" : [ "application/json" ],
   "produces" : [ "application/json" ],
@@ -1380,7 +1380,7 @@
       "post" : {
         "tags" : [ "Recurring Billing" ],
         "summary" : "Add a subscription",
-        "description" : "Create a new subscription on the start date. Returns the subscription_id, save this id to interact with this subscription using the API. Once the subscription is added successfully, If the plan has one time set up fee,  a payment gateway request is also made to bill the customer the one time fee. Check the response in the return model to check status of the  Gateway request. Note that the subscription remains active even if the gateway request fails. A one off subscription - i.e., a subscription without a plan can be created by not sending the plan_code and sending fields applicable to one-off plans. <br><br><strong> Additional required body fields: </strong><br>amt_tran<br>customer_id<br>date_start",
+        "description" : "Create a new subscription on the start date. Returns the subscription_id, save this id to interact with this subscription using the API. Once the subscription is added successfully, If the plan has one time set up fee,  a payment gateway request is also made to bill the customer the one time fee. Check the response in the return model to check status of the  Gateway request. Note that the subscription remains active even if the gateway request fails. A one off subscription - i.e., a subscription without a plan can be created by not sending the plan_code and sending fields applicable to one-off plans. <br><br><strong> Additional required body fields: </strong><br>customer_id<br>date_start",
         "operationId" : "addSubscription",
         "parameters" : [ {
           "in" : "body",
@@ -2692,6 +2692,88 @@
     }
   },
   "definitions" : {
+    "SubscriptionListResponse" : {
+      "type" : "object",
+      "required" : [ "code", "data", "message", "totalPages", "totalRecords" ],
+      "properties" : {
+        "code" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 0,
+          "description" : "Response code from API. 0 indicates success. Refer to <a href=\"/developer/api/reference#api-response-codes\"target=\"_blank\">Platform API Response Codes</a> for entire list of return codes.",
+          "readOnly" : true
+        },
+        "message" : {
+          "type" : "string",
+          "example" : "Success",
+          "description" : "A short description of the API response code.",
+          "readOnly" : true
+        },
+        "totalPages" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 10,
+          "description" : "Total Number of pages. ",
+          "readOnly" : true
+        },
+        "totalRecords" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 100,
+          "description" : "Total number of records. ",
+          "readOnly" : true
+        },
+        "data" : {
+          "type" : "array",
+          "description" : "An array of the resource object.",
+          "readOnly" : true,
+          "items" : {
+            "$ref" : "#/definitions/Subscription"
+          }
+        }
+      }
+    },
+    "BatchResponse" : {
+      "type" : "object",
+      "required" : [ "code", "data", "message", "totalPages", "totalRecords" ],
+      "properties" : {
+        "code" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 0,
+          "description" : "Response code from API. 0 indicates success. Refer to <a href=\"/developer/api/reference#api-response-codes\"target=\"_blank\">Platform API Response Codes</a> for entire list of return codes.",
+          "readOnly" : true
+        },
+        "message" : {
+          "type" : "string",
+          "example" : "Success",
+          "description" : "A short description of the API response code.",
+          "readOnly" : true
+        },
+        "totalPages" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 10,
+          "description" : "Total Number of pages. ",
+          "readOnly" : true
+        },
+        "totalRecords" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 100,
+          "description" : "Total number of records. ",
+          "readOnly" : true
+        },
+        "data" : {
+          "type" : "array",
+          "description" : "An array of the resource object.",
+          "readOnly" : true,
+          "items" : {
+            "$ref" : "#/definitions/BatchReport"
+          }
+        }
+      }
+    },
     "CustomerVault" : {
       "type" : "object",
       "properties" : {
@@ -2757,88 +2839,6 @@
           "description" : "Array of Billing Cards. If this field is not an array, it is ignored.",
           "items" : {
             "$ref" : "#/definitions/BillingCard"
-          }
-        }
-      }
-    },
-    "BatchResponse" : {
-      "type" : "object",
-      "required" : [ "code", "data", "message", "totalPages", "totalRecords" ],
-      "properties" : {
-        "code" : {
-          "type" : "integer",
-          "format" : "int32",
-          "example" : 0,
-          "description" : "Response code from API. 0 indicates success. Refer to <a href=\"/developer/api/reference#api-response-codes\"target=\"_blank\">Platform API Response Codes</a> for entire list of return codes.",
-          "readOnly" : true
-        },
-        "message" : {
-          "type" : "string",
-          "example" : "Success",
-          "description" : "A short description of the API response code.",
-          "readOnly" : true
-        },
-        "totalPages" : {
-          "type" : "integer",
-          "format" : "int32",
-          "example" : 10,
-          "description" : "Total Number of pages. ",
-          "readOnly" : true
-        },
-        "totalRecords" : {
-          "type" : "integer",
-          "format" : "int32",
-          "example" : 100,
-          "description" : "Total number of records. ",
-          "readOnly" : true
-        },
-        "data" : {
-          "type" : "array",
-          "description" : "An array of the resource object.",
-          "readOnly" : true,
-          "items" : {
-            "$ref" : "#/definitions/BatchReport"
-          }
-        }
-      }
-    },
-    "SubscriptionListResponse" : {
-      "type" : "object",
-      "required" : [ "code", "data", "message", "totalPages", "totalRecords" ],
-      "properties" : {
-        "code" : {
-          "type" : "integer",
-          "format" : "int32",
-          "example" : 0,
-          "description" : "Response code from API. 0 indicates success. Refer to <a href=\"/developer/api/reference#api-response-codes\"target=\"_blank\">Platform API Response Codes</a> for entire list of return codes.",
-          "readOnly" : true
-        },
-        "message" : {
-          "type" : "string",
-          "example" : "Success",
-          "description" : "A short description of the API response code.",
-          "readOnly" : true
-        },
-        "totalPages" : {
-          "type" : "integer",
-          "format" : "int32",
-          "example" : 10,
-          "description" : "Total Number of pages. ",
-          "readOnly" : true
-        },
-        "totalRecords" : {
-          "type" : "integer",
-          "format" : "int32",
-          "example" : 100,
-          "description" : "Total number of records. ",
-          "readOnly" : true
-        },
-        "data" : {
-          "type" : "array",
-          "description" : "An array of the resource object.",
-          "readOnly" : true,
-          "items" : {
-            "$ref" : "#/definitions/Subscription"
           }
         }
       }
@@ -2968,19 +2968,6 @@
         }
       }
     },
-    "GetAppData" : {
-      "type" : "object",
-      "properties" : {
-        "app" : {
-          "description" : "The details specific to this application.",
-          "$ref" : "#/definitions/ApplicationModel"
-        },
-        "pricing" : {
-          "description" : "The pricing available to this application.",
-          "$ref" : "#/definitions/PricingModel"
-        }
-      }
-    },
     "EmbeddedKey" : {
       "type" : "object",
       "required" : [ "merchant_id" ],
@@ -3012,6 +2999,19 @@
         }
       }
     },
+    "GetAppData" : {
+      "type" : "object",
+      "properties" : {
+        "app" : {
+          "description" : "The details specific to this application.",
+          "$ref" : "#/definitions/ApplicationModel"
+        },
+        "pricing" : {
+          "description" : "The pricing available to this application.",
+          "$ref" : "#/definitions/PricingModel"
+        }
+      }
+    },
     "QPApiResponse" : {
       "type" : "object",
       "required" : [ "code", "data", "message" ],
@@ -3033,47 +3033,6 @@
           "description" : "If request is successful, this field will contain the response resource. If there are input validation errors i.e, the  code is 2, this field may contain a list of fields that failed the validation.",
           "readOnly" : true,
           "$ref" : "#/definitions/QPApiData"
-        }
-      }
-    },
-    "BrowseSalesRepsData" : {
-      "type" : "object",
-      "required" : [ "usser_id" ],
-      "properties" : {
-        "user_id" : {
-          "type" : "integer",
-          "format" : "int64"
-        },
-        "user_first_name" : {
-          "type" : "string",
-          "example" : "Joe",
-          "description" : "The user's first name.",
-          "readOnly" : true
-        },
-        "user_last_name" : {
-          "type" : "string",
-          "example" : "Doe",
-          "description" : "The user's last name.",
-          "readOnly" : true
-        },
-        "user_email" : {
-          "type" : "string",
-          "example" : "joe@qualpay.com",
-          "description" : "The user's email address.",
-          "readOnly" : true
-        },
-        "user_login" : {
-          "type" : "string",
-          "example" : "joe123",
-          "description" : "This user's login name to the Qualpay platform.",
-          "readOnly" : true
-        },
-        "usser_id" : {
-          "type" : "integer",
-          "format" : "int64",
-          "example" : 1,
-          "description" : "Unique ID assigned by Qualpay to this user.",
-          "readOnly" : true
         }
       }
     },
@@ -3185,6 +3144,11 @@
           "example" : "94538",
           "description" : "The billing zip code of the cardholder."
         },
+        "customer_id" : {
+          "type" : "string",
+          "example" : "JOHNDOE",
+          "description" : " A unique id to identify the customer in Qualpay. If this is an existing customer, the checkout transaction will be linked to the customer. If this is a new customer, a new customer record is created in Qualpay. The customer_first_name and customer_last_name fields are required for new customers. This field is applicable only for merchant ids that are configured to use Qualpay Customer Vault."
+        },
         "preferences" : {
           "description" : "Preferences included in the request",
           "$ref" : "#/definitions/CheckoutPreferences"
@@ -3195,6 +3159,47 @@
           "items" : {
             "$ref" : "#/definitions/GatewayResponse"
           }
+        }
+      }
+    },
+    "BrowseSalesRepsData" : {
+      "type" : "object",
+      "required" : [ "usser_id" ],
+      "properties" : {
+        "user_id" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "user_first_name" : {
+          "type" : "string",
+          "example" : "Joe",
+          "description" : "The user's first name.",
+          "readOnly" : true
+        },
+        "user_last_name" : {
+          "type" : "string",
+          "example" : "Doe",
+          "description" : "The user's last name.",
+          "readOnly" : true
+        },
+        "user_email" : {
+          "type" : "string",
+          "example" : "joe@qualpay.com",
+          "description" : "The user's email address.",
+          "readOnly" : true
+        },
+        "user_login" : {
+          "type" : "string",
+          "example" : "joe123",
+          "description" : "This user's login name to the Qualpay platform.",
+          "readOnly" : true
+        },
+        "usser_id" : {
+          "type" : "integer",
+          "format" : "int64",
+          "example" : 1,
+          "description" : "Unique ID assigned by Qualpay to this user.",
+          "readOnly" : true
         }
       }
     },
@@ -4196,6 +4201,19 @@
         }
       }
     },
+    "SaveDataRequest" : {
+      "type" : "object",
+      "required" : [ "data" ],
+      "properties" : {
+        "data" : {
+          "type" : "array",
+          "description" : "An array of data fields to save to the application.",
+          "items" : {
+            "$ref" : "#/definitions/ApplicationData"
+          }
+        }
+      }
+    },
     "CustomerResponse" : {
       "type" : "object",
       "required" : [ "code", "data", "message" ],
@@ -4217,19 +4235,6 @@
           "description" : "If request is successful, this field will contain the response resource. If there are input validation errors i.e, the  code is 2, this field may contain a list of fields that failed the validation.",
           "readOnly" : true,
           "$ref" : "#/definitions/CustomerVault"
-        }
-      }
-    },
-    "SaveDataRequest" : {
-      "type" : "object",
-      "required" : [ "data" ],
-      "properties" : {
-        "data" : {
-          "type" : "array",
-          "description" : "An array of data fields to save to the application.",
-          "items" : {
-            "$ref" : "#/definitions/ApplicationData"
-          }
         }
       }
     },
@@ -4276,7 +4281,7 @@
           "type" : "integer",
           "format" : "int32",
           "example" : 3,
-          "description" : "Applicable only for monthly frequency. Number of months in a subscription cycle."
+          "description" : "Applicable only for monthly or weekly plans. Number of months/weeks in a subscription cycle."
         },
         "plan_duration" : {
           "type" : "integer",
@@ -4605,23 +4610,6 @@
         }
       }
     },
-    "PricingModel" : {
-      "type" : "object",
-      "properties" : {
-        "pricing_id" : {
-          "type" : "integer",
-          "format" : "int64",
-          "example" : 1,
-          "description" : "Unique ID assigned by Qualpay to this pricing plan.",
-          "readOnly" : true
-        },
-        "plan" : {
-          "description" : "The pricing plan object.",
-          "readOnly" : true,
-          "$ref" : "#/definitions/PlanModel"
-        }
-      }
-    },
     "CheckoutResponse" : {
       "type" : "object",
       "required" : [ "code", "data", "message" ],
@@ -4643,6 +4631,23 @@
           "description" : "If request is successful, this field will contain the response resource. If there are input validation errors i.e, the  code is 2, this field may contain a list of fields that failed the validation.",
           "readOnly" : true,
           "$ref" : "#/definitions/Checkout"
+        }
+      }
+    },
+    "PricingModel" : {
+      "type" : "object",
+      "properties" : {
+        "pricing_id" : {
+          "type" : "integer",
+          "format" : "int64",
+          "example" : 1,
+          "description" : "Unique ID assigned by Qualpay to this pricing plan.",
+          "readOnly" : true
+        },
+        "plan" : {
+          "description" : "The pricing plan object.",
+          "readOnly" : true,
+          "$ref" : "#/definitions/PlanModel"
         }
       }
     },
@@ -5134,7 +5139,7 @@
         },
         "card_id" : {
           "type" : "string",
-          "description" : "Tokenized Card number. If a card_id is not present in an add request, it is automatically created from the card_number. A card can be added only once. Duplicate cards are not permitted for a customer in the system. "
+          "description" : "Tokenized Card number. If a card_id is not present in an add request, it is automatically created from the card_number. A card can be added only once. Duplicate cards are not permitted for a customer in the system. The card_id should be permanent. If this is a single use card_id, set the verify field to true which will make the card_id permanent."
         },
         "billing_first_name" : {
           "type" : "string",
@@ -5252,58 +5257,6 @@
         }
       }
     },
-    "ShippingAddress" : {
-      "type" : "object",
-      "required" : [ "shipping_first_name", "shipping_last_name" ],
-      "properties" : {
-        "shipping_first_name" : {
-          "type" : "string",
-          "example" : "John",
-          "description" : "Shipping First Name. Can contain upto 32 characters. "
-        },
-        "shipping_last_name" : {
-          "type" : "string",
-          "example" : "Doe",
-          "description" : "Shipping Last Name. Can contain upto 32 characters."
-        },
-        "shipping_addr1" : {
-          "type" : "string",
-          "example" : "123 Main Street",
-          "description" : "Shipping Address line Item 1"
-        },
-        "shipping_addr2" : {
-          "type" : "string",
-          "example" : "#1234",
-          "description" : "Shipping Address line Item 2"
-        },
-        "shipping_city" : {
-          "type" : "string",
-          "example" : "San Mateo",
-          "description" : "Shipping City"
-        },
-        "shipping_state" : {
-          "type" : "string",
-          "example" : "CA",
-          "description" : "Shipping State"
-        },
-        "shipping_country" : {
-          "type" : "string",
-          "example" : "USA",
-          "description" : "Shipping Country"
-        },
-        "shipping_zip" : {
-          "type" : "string",
-          "example" : "99999",
-          "description" : "Shipping Zip"
-        },
-        "primary" : {
-          "type" : "boolean",
-          "example" : true,
-          "description" : "Set this field to true if this should be the default address. If there are multiple addresses with primary true, only one of the card will be choosen to be the defaul address. Default value is false. ",
-          "default" : false
-        }
-      }
-    },
     "BatchReport" : {
       "type" : "object",
       "required" : [ "amt_purch", "amt_return", "amt_total", "batch_date", "batch_id", "batch_number", "cnt_purch", "cnt_return", "cnt_total", "merchant_id", "tran_currency" ],
@@ -5376,6 +5329,58 @@
           "example" : "10",
           "description" : "The count of returns or credits back to the customer in the batch.",
           "readOnly" : true
+        }
+      }
+    },
+    "ShippingAddress" : {
+      "type" : "object",
+      "required" : [ "shipping_first_name", "shipping_last_name" ],
+      "properties" : {
+        "shipping_first_name" : {
+          "type" : "string",
+          "example" : "John",
+          "description" : "Shipping First Name. Can contain upto 32 characters. "
+        },
+        "shipping_last_name" : {
+          "type" : "string",
+          "example" : "Doe",
+          "description" : "Shipping Last Name. Can contain upto 32 characters."
+        },
+        "shipping_addr1" : {
+          "type" : "string",
+          "example" : "123 Main Street",
+          "description" : "Shipping Address line Item 1"
+        },
+        "shipping_addr2" : {
+          "type" : "string",
+          "example" : "#1234",
+          "description" : "Shipping Address line Item 2"
+        },
+        "shipping_city" : {
+          "type" : "string",
+          "example" : "San Mateo",
+          "description" : "Shipping City"
+        },
+        "shipping_state" : {
+          "type" : "string",
+          "example" : "CA",
+          "description" : "Shipping State"
+        },
+        "shipping_country" : {
+          "type" : "string",
+          "example" : "USA",
+          "description" : "Shipping Country"
+        },
+        "shipping_zip" : {
+          "type" : "string",
+          "example" : "99999",
+          "description" : "Shipping Zip"
+        },
+        "primary" : {
+          "type" : "boolean",
+          "example" : true,
+          "description" : "Set this field to true if this should be the default address. If there are multiple addresses with primary true, only one of the card will be choosen to be the defaul address. Default value is false. ",
+          "default" : false
         }
       }
     },
